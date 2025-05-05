@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up - Crownic</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-green-100 to-teal-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white rounded-3xl shadow-lg p-8 w-full max-w-lg">
+    <h2 class="text-2xl font-semibold text-center mb-4">Register to Crownic</h2>
+    <p class="text-center text-blue-600 mb-4">You were referred by <span id="refText">Someone</span></p>
+    <form>
+      <input type="text" placeholder="Full Name" class="w-full mb-2 p-3 rounded-xl bg-blue-50" required />
+      <input type="text" placeholder="Username" class="w-full mb-2 p-3 rounded-xl bg-blue-50" required />
+      <input type="email" placeholder="Email" class="w-full mb-2 p-3 rounded-xl bg-blue-50" required />
+      <input type="tel" placeholder="Mobile Number" class="w-full mb-2 p-3 rounded-xl bg-blue-50" required />
+      <input type="password" placeholder="Password" class="w-full mb-2 p-3 rounded-xl bg-blue-50" required />
+      <input type="password" placeholder="Confirm Password" class="w-full mb-2 p-3 rounded-xl bg-blue-50" required />
+      <input type="hidden" id="referrer" />
+      <button type="submit" class="w-full bg-green-600 text-white py-3 rounded-xl">Sign Up</button>
+    </form>
+    <p class="text-center mt-4">Already have an account? <a href="login.html" class="text-blue-600">Login</a></p>
+  </div>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const ref = urlParams.get('ref');
+    if (ref) {
+      document.getElementById('referrer').value = ref;
+      document.getElementById('refText').textContent = ref;
+    }
+
+    document.querySelector('form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const fields = e.target;
+      const data = {
+        fullName: fields[0].value,
+        username: fields[1].value,
+        email: fields[2].value,
+        mobile: fields[3].value,
+        password: fields[4].value,
+        referrer: document.getElementById('referrer').value
+      };
+
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      const out = await res.json();
+      if (res.ok) {
+        alert('Registered! You can now login.');
+        window.location.href = 'login.html';
+      } else {
+        alert(out.msg || out.errors?.[0]?.msg);
+      }
+    });
+  </script>
+</body>
+</html>
